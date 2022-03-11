@@ -5,8 +5,8 @@ var usuarioSchema = Schema ({
     nombres: String,
     apellidos: String,
     nombre_usuario: String,
-    contraseña: String,
-    role: String,
+    password: String,
+    rol: String,
     correo: String,
     bills: [{type: Schema.ObjectId, ref: "facturas"}]
 })
