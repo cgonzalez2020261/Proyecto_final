@@ -1,5 +1,5 @@
 const  Usuario = require("../models/usuario.models");
-const carrito = require("../models/carrito.models");
+const Carrito = require("../models/carrito.models");
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("../service/jwt");
 
@@ -56,8 +56,8 @@ function registrarUsuario(req,res){
     var parametros = req.body;
  
  
-         usuarioModel.nombre = parametros.nombres;
-         usuarioModel.apellido = parametros.apellidos;
+         usuarioModel.nombres = parametros.nombres;
+         usuarioModel.apellidos = parametros.apellidos;
          usuarioModel.nombre_usuario = parametros.user;
          usuarioModel.correo = parametros.correo;
          usuarioModel.rol = 'ROL_CLIENTE';
@@ -93,15 +93,14 @@ function registrarUsuario(req,res){
  }
 
 
-function editaUsario(req, res){
+ function editarUsuario(req, res){
     var parametros = req.body;
-    var iduser= req.params.idUsario;
-    var usuarioenToken = req.user.sub;
+    var iduser= req.params.id;
 
 
     Usuario.findOne({userId:iduser},(err,usuarioEncontrado)=>{
         if(err) return res.status(500).send({message:'error en la peticion'});
-        if(usuarioEncontrado._id !== iduser){
+        if(req.user.rol !== "ADMIN"){
 
             return res.status(500).send({message:'no tiene permisos para editar este usuario'})
         }else{
@@ -116,17 +115,49 @@ function editaUsario(req, res){
         }
 
     })
+ }
 
+ function cerrarCarrito(user){
+    Carrito.findOneAndRemove({usuario: user._id},(err, carritoEliminado)=>{
+        if(err){
+            console.log("error al eliminar carrito");
+        }else if(carritoEliminado){
+            console.log("Carrito eliminado exitosamente");
+        }
+    })
+}
 
-
-
+function eliminarUsuario(req,res){
+    let usuarioId = req.params.id;
+    
+    if(req.user.rol == "ADMIN"){
+        Usuario.findById(usuarioId, (err, usuarioEncontrado)=>{
+            if(err){
+                return res.status(500).send({message: "error en la peticion"});
+            }else if(usuarioEncontrado){
+                
+                    cerrarCarrito(usuarioEncontrado);
+                    Usuario.findByIdAndRemove(usuarioId,(err, usuarioEliminado)=>{
+                        if(err){
+                            return res.status(500).send({message: "Error al intentar eliminar"});
+                        }else if(usuarioEliminado){
+                            return res.send({usuario: usuarioEliminado});
+                        }
+                    })
+            }else{
+                return res.status(403).send({message: "error al eliminar"});
+            }
+        })
+    }else{
+        return res.status(401).send({message: "no tiene los permisos necesarios"});
+    }
 }
 
 module.exports = {
     RegistrarAdmin,
     Login,
-    registrarUsuario
-    /*
-    updateUser,
-    removeUser+*/
+    registrarUsuario,
+    editarUsuario,
+    cerrarCarrito,
+    eliminarUsuario
 }

@@ -7,11 +7,11 @@ function agregarProductos(req,res){
 
     if(parametros.nombre && parametros.precio && parametros.stock){
         Categoria.findById(categoriaId, (err, categoriaEncontrada)=>{
-            if(err){return res.status(500).send({message: "Error al encontrar la categoria"});
+            if(err){return res.status(500).send({message: "error en la peticion"});
             }else if(categoriaEncontrada){
                 Producto.findOne({nombre: parametros.nombre},(err, productoEncontrado)=>{
                     if(err){
-                        return res.status(500).send({message: "Error al buscar el producto deseado"});
+                        return res.status(500).send({message: "error al enconrtar"});
                     }else if(productoEncontrado){
                         return res.send({message: "Producto ya existente"});
                     }else{
@@ -43,7 +43,7 @@ function agregarProductos(req,res){
             }
         })
     }else{
-        return res.status(403).send({message: "Ingrese los datos mínimos (Nombre, precio y cantidad)"});
+        return res.status(403).send({message: "debe llenar los parametros obligatoriso"});
     }
 }
 
@@ -55,7 +55,7 @@ function actualizarProducto(req,res){
     if(actualizar.stock){
         Producto.findById(productoId,(err, productoEncontrado)=>{
             if(err){
-                return res.status(500).send({message: "Error al buscar producto"});
+                return res.status(500).send({message: "error en la peticion"});
             }else if(productoEncontrado){
                 Categoria.findOne({_id:categoriaId,productos:productoId},(err,categoriaEncontrada)=>{
                     if(err){
@@ -79,7 +79,7 @@ function actualizarProducto(req,res){
             }
         })
     }else{
-        return res.status(403).send({message: "Ingrese los datos mínimos (cantidad)"});
+        return res.status(403).send({message: "debe llenar los parametros obligatorios"});
     }
 }
 

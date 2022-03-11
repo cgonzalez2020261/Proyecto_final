@@ -7,14 +7,14 @@ function crearCategoria(req,res){
     if(parametros.nombre){
         Categoria.findOne({nombre: parametros.nombre},(err, categoriaEncontrada)=>{
             if(err){
-                return res.status(500).send({message: "error en la busqueda"});
+                return res.status(500).send({message: "error en la peticion"});
             }else if(categoriaEncontrada){
                 return res.send({message: "la categoria ya existe"});
             }else{
                 modeloCategoria.nombre = parametros.nombre;
                 modeloCategoria.save((err, categoriaGuardada)=>{
                     if(err){
-                        return res.status(500).send({message: "Error al agregar"});
+                        return res.status(500).send({message: "error al agregar"});
                     }else if(categoriaGuardada){
                         return res.send({categoria: categoriaGuardada});
                     }else{
@@ -24,7 +24,7 @@ function crearCategoria(req,res){
             }
         })
     }else{
-        return res.status(403).send({message: "Ingrese los datos mínimos (Nombre)"})
+        return res.status(403).send({message: "debe llenar los parametros obligatorios"})
     }
 }
 
@@ -58,7 +58,7 @@ function ActualizarCategoria(req,res){
     if(parametros.nombre){
         Categoria.findOne({nombre: parametros.nombre},(err, categoriaEncontrada)=>{
             if(err){
-                return res.status(500).send({message: "error al buscar"});
+                return res.status(500).send({message: "error en la peticion"});
             }else if(categoriaEncontrada){
                 return res.send({message: "la categoria ya existe"});
             }else{
@@ -74,7 +74,7 @@ function ActualizarCategoria(req,res){
             }
         })
     }else{
-        return res.status(403).send({message: "ingrese los campos obligatorios (nuevo nombre de la categoria)"});
+        return res.status(403).send({message: "llenar los parametros obligatorios"});
     }
 }
 
@@ -84,7 +84,7 @@ function eliminarCategoria(req,res){
 
     Categoria.findOne({_id : categoriaId}, (err, categoriaEncontrada)=>{
         if(err){
-            return res.status(500).send({message: "error al buscar"});
+            return res.status(500).send({message: "error en la peticion"});
         }else if(categoriaEncontrada){
             var productos = categoriaEncontrada.productos;
             Categoria.findOneAndUpdate({nombre: "Default"},{$push:{productos: productos}}, {new: true},(err, categoriaActualizada)=>{
@@ -101,16 +101,12 @@ function eliminarCategoria(req,res){
                                     return res.status(500).send({message: "no se pudo eliminar"});
                                 }else if(categoriaEliminada){
                                     return res.send({categoria: categoriaEliminada});
-                                }else{
-                                    return res.status(404).send({message: "no se pudo eliminar"});
                                 }
                             })
                         }else{
                             return res.status(403).send({message: "esta categoria no existe :v"});
                         }
                     })
-                }else{
-                    return res.status(404).send({message: "error en la actualizacion owo"});
                 }
             })
         }else{
@@ -122,7 +118,7 @@ function eliminarCategoria(req,res){
 function verCategorias(req,res){
     Categoria.find({}).populate("productos").exec((err, TdoCategorias)=>{
         if(err){
-            return res.status(500).send({message: "Error al obtener los datos"});
+            return res.status(500).send({message: "error en la peticion"});
         }else if(TdoCategorias){
             return res.send({message: " Todas las categorias:", TdoCategorias});
         }else{
@@ -137,15 +133,11 @@ function buscarCategorias(req,res){
     if(parametros.search){
         Categoria.find({nombre: parametros.search},(err, categoriaEncontrada)=>{
             if(err){
-                return res.status(500).send({message: "error al buscar categoria"});
+                return res.status(500).send({message: "error en la peticion"});
             }else if(categoriaEncontrada){
                 if(categoriaEncontrada != ""){
                     return res.send({message: "Coinciencias encontradas: ", categoriaEncontrada});
-                }else{
-                    return res.status(404).send({message: "no se encontraron coincidencias"});
                 }
-            }else{
-                return res.status(404).send({message: "No se encontraron coincidencias owo"});
             }
         })
     }else if(parametros.search == ""){
@@ -154,8 +146,6 @@ function buscarCategorias(req,res){
                 return res.status(500).send({message: "error al obtener las categorias"});
             }else if(Categorias){
                 return res.send({categorias: Categorias});
-            }else{
-                return res.status(403).send({message: "No hay cateogiras disponibles"});
             }
         })
     }else{
