@@ -1,5 +1,6 @@
 var Producto = require("../models/producto.models");
 var Categoria = require("../models/categoria.models");
+var Factura = require("../models/factura.models");
 
 function agregarProductos(req,res){
     var categoriaId = req.params.idcat;
@@ -161,6 +162,8 @@ function productosGastados(req,res){
         }
     })
 }
+
+
 
 module.exports = {
     agregarProductos,

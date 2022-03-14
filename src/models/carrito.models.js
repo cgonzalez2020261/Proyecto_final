@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var caritoSchema = ({
     compra: Boolean,
-    dueño: {type: Schema.ObjectId, ref:"Usuarios"},
+    usuario: {type: Schema.ObjectId, ref:"Usuarios"},
     producto: [{type: Schema.ObjectId, ref:"Productos"}],
     stock: [Number]
 })

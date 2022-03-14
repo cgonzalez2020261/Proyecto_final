@@ -42,11 +42,11 @@ function Login(req, res) {
                     if (verificacionPassword) {
                         return res.status(200).send({ token: jwt.crearToken(entidadEncontrado) })
                     } else {
-                        return res.status(500).send({ mensaje: 'La contrasena no coincide.'})
+                        return res.status(500).send({ mensaje: 'el password no coinciden'})
                     }
                 })
         } else {
-            return res.status(500).send({ mensaje: 'El usuario, no se ha podido identificar'})
+            return res.status(500).send({ mensaje: 'el usuario no se ha podido identificar'})
         }
     })
 }
@@ -75,16 +75,16 @@ function registrarUsuario(req,res){
                  usuarioModel.save((err,usuarioGuadado)=>{
                      if(err) return res.status(500).send({message:'error en la peticion'});
  
-                     if(!usuarioEncontrado) return res.status(500).send({message:'error al agregar el Usuario'});
+                     if(!usuarioEncontrado){return res.status(500).send({message:'error al agregar el Usuario'});}else{
+                         crearCarrito(usuarioGuadado);
+                     } 
  
                      return res.status(200).send({usuario: usuarioGuadado});
- 
- 
                  })
  
              })
          }else{
-             return res.status(500).send({message:'El nombre de usuario ya esta en uso '})
+             return res.status(500).send({message:'el nombre usuario ya se encuentra en uso '})
          }
  
  
@@ -92,30 +92,22 @@ function registrarUsuario(req,res){
  
  }
 
+ function crearCarrito(Usuario){
+    var carritoModel = new Carrito();
 
- function editarUsuario(req, res){
-    var parametros = req.body;
-    var iduser= req.params.id;
-
-
-    Usuario.findOne({userId:iduser},(err,usuarioEncontrado)=>{
-        if(err) return res.status(500).send({message:'error en la peticion'});
-        if(req.user.rol !== "ADMIN"){
-
-            return res.status(500).send({message:'no tiene permisos para editar este usuario'})
+    carritoModel.compra = false;
+    carritoModel.usuario = Usuario._id;
+    carritoModel.save((err, carritoGuardado)=>{
+        if(err){
+            console.log(err);
+        }else if(carritoGuardado){
+            console.log("Carrito de compras creado exitosamente", carritoGuardado);
         }else{
-
-            Usuario.findByIdAndUpdate(iduser,parametros,{new:true}, (err,usuarioEditado)=>{
-                if(err)return res.status(500).send({message:'error en la peticion'});
-                if(!usuarioEditado) return res.status(500).send({message:'error al editar el usario'});
-
-                return res.status(200).send({usuario :usuarioEditado})
-
-            })
+            console.log("el carrito no se pudo crear");
         }
-
     })
- }
+}
+
 
  function cerrarCarrito(user){
     Carrito.findOneAndRemove({usuario: user._id},(err, carritoEliminado)=>{
@@ -157,7 +149,7 @@ module.exports = {
     RegistrarAdmin,
     Login,
     registrarUsuario,
-    editarUsuario,
     cerrarCarrito,
-    eliminarUsuario
+    eliminarUsuario,
+    crearCarrito
 }
